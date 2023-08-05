@@ -60,18 +60,18 @@ xz -kdc backups/empty-hda.img.xz > disks/minix.img
 $ ./86box -S
 ```
 Проверяем, что настройки эмулятора 86box выставлены согласно скриншотам ниже.
-![86box-settings-machine](screenshots/86box-settings-machine.png)
-![86box-settings-display](screenshots/86box-settings-display.png)
-![86box-settings-input-devices](screenshots/86box-settings-input-devices.png)
-![86box-settings-sound](screenshots/86box-settings-sound.png)
-![86box-settings-network](screenshots/86box-settings-network.png)
-![86box-settings-ports-com-ltp-serial-port-1](screenshots/86box-settings-ports-com-ltp-serial-port-1.png)
-![86box-settings-storage-controllers](screenshots/86box-settings-storage-controllers.png)
+![86box-settings-machine](https://habrastorage.org/webt/n-/1z/is/n-1zisoqfs8h92kh9ffzdsqgz3e.png)
+![86box-settings-display](https://habrastorage.org/webt/eh/gg/ih/ehggihkae77fyppd7zexoobyp5g.png)
+![86box-settings-input-devices](https://habrastorage.org/webt/0-/h1/bf/0-h1bfm6rwbjaqriesun-juvqmc.png)
+![86box-settings-sound](https://habrastorage.org/webt/ff/xl/iw/ffxliwz5umgoqmory5vgs1ymnzo.png)
+![86box-settings-network](https://habrastorage.org/webt/k0/9x/6a/k09x6alcgd79azai3rviklbyf3g.png)
+![86box-settings-ports-com-ltp-serial-port-1](https://habrastorage.org/webt/fv/mg/6v/fvmg6v2x_0cdpkt9iacbdzsw27o.png)
+![86box-settings-storage-controllers](https://habrastorage.org/webt/sz/lq/9j/szlq9jenf01qdezeqyvomwtyof0.png)
 Добавляем жесткий диск `disks/minix.img` с указанными характеристиками.
-![86box-settings-hdd](screenshots/86box-settings-hdd.png)
-![86box-settings-floppy-cdroms](screenshots/86box-settings-floppy-cdroms.png)
-![86box-settings-other-removable-devices](screenshots/86box-settings-other-removable-devices.png)
-![86box-settings-other-peripherals](screenshots/86box-settings-other-peripherals.png)
+![86box-settings-hdd](https://habrastorage.org/webt/mj/rl/p-/mjrlp-nos1_0eyoaygirwnrscu0.png)
+![86box-settings-floppy-cdroms](https://habrastorage.org/webt/-s/ay/_e/-say_ejgu3h9ben62spahjn6qzi.png)
+![86box-settings-other-removable-devices](https://habrastorage.org/webt/zv/rk/qo/zvrkqoiuzxwtdkpznixyew4jw_k.png)
+![86box-settings-other-peripherals](https://habrastorage.org/webt/ed/n8/yq/edn8yqedng6cwco7bpfihyzk22s.png)
 
 
 # Установка оригинальной 16-битной версии Minix 1.5.10<a name="minix-1.5.10-ph"></a>
@@ -81,10 +81,10 @@ $ ./86box -S
 $ ./86box
 ```
 Первым делом заходим в настройки BIOS и установливаем характеристики жесткого диска и флоппи дисководов. ВАЖНО, что бы floppy A был 360K 5.25. Сохраняемся и выходим.
-![bios-floppyA-360k](screenshots/Monitor_1_20230729-163726-139.png)
+![bios-floppyA-360k](https://habrastorage.org/webt/1a/lf/qr/1alfqrp_iygthsjhfopgwqy_tyw.png)
 
 Проверяем, что в дисковод вставлена [загрузочная дискета для PC](dist/minix/disk02.img) и после проверки BIOS на экране эмулятора должно появится меню.
-![Загрузка](screenshots/Monitor_1_20220912-211515-397397.png)
+![Загрузка](https://habrastorage.org/webt/ts/ls/ho/tslshocapqa-_nbmsm92u1c7dkk.png)
 
 После того, как загрузочная программа полностью загрузилось с дискеты (*в статусной строке эмулятора перестанет мигать зеленым цветом "индикатор" дисковода*) и появилось приглашение ввода команды:
 ```
@@ -96,7 +96,7 @@ $ ./86box
 
 В Minix 1.5.10, имеется, по меньшей мере, 2 учетные записи. Первая из них - это привелигированная рутовая учетная запись `root` с паролем `Geheim`, а также имеется обычный пользователь `ast` с паролем `Wachtwoord`. Авторизуйтесь как `root`.
 
-![login](screenshots/Monitor_1_20230729-163949-306.png)
+![login](https://habrastorage.org/webt/3g/cm/e8/3gcme8tv_m-ph34-t8tbqbfz3di.png)
 
 ## Настраиваем getty (опционально)
 На этом этапе упростим дальнейшее взаимодействие с Minix. Вводить команды в окне эмулятора это с одной стороны более "правильный" путь, но всё же это эмулятор, плюс вводить команды таким способом это очень медленно, да и copy-paste с этой инструкции будет не возможен :)
@@ -123,7 +123,7 @@ $ cat <path>/etc/ttys
 ```
 $ minicom -o -c off -t vt100 -p pts/7 -b 9600
 ```
-![minicom](screenshots/linux-host-minicom.png)
+![minicom](https://habrastorage.org/webt/aj/vx/km/ajvxkmyalabtzzpfhhiukibnq1m.png)
 
 ## Разметка жесткого диска
 Перед началом установки Minix необходимо разметить виртуальный жесткий диск. Для этого введите команду:
@@ -208,7 +208,7 @@ Num Sorted Active Type     Cyl Head Sec   Cyl Head Sec    Base    Last    Size
 
 После отображения загрузочного меню, необходимо изменить корневой раздел с которого будет производится загрузка. Во всех предыдущих шагах загружались с дискеты (`disk04`), но в этот раз необходимо загрузится с раздела жесткого диска. Для изменения корневого раздела в меню введите `r` (*select root device*), и далее `h2`, далее <ENTER> и после этого `=`.
 
-![change-root](screenshots/Monitor_1_20230729-172933-185.png)
+![change-root](https://habrastorage.org/webt/nw/ng/uv/nwnguvvdq_gve20zcuwvfeuelgu.png)
 
 Также, как в первом запуске, операционная система попросит вставить дискету с `/usr` (это `disk05`) и затем необходимо будет вновь авторизоваться как `root`.
 
@@ -416,8 +416,8 @@ tar cvfJ backups/minix-1.5.10-install-hda.tar.xz disks/minix.img nvr/acc386.nvr 
 
 Но прежде, чем мы начнем преображение, необходимо немного "апгрейдить" наш виртуальный PC. Изначально, при установке классического Minix, были задействован дисковод 5.25 на 360Кб. Только установив данный тип виртуального дисковода в настройках эмулятора и BIOS, мне удалось произвести установку и написать это руководство. Но для загрузки 32-битной версии Minix понадобятся уже 5.25 1.2 Мб дискеты (*а также позже для Linux*), соответственно необходимо, убедиться, что в настройках эмулятора указан соответствующий тип дисковода, а в BIOS также установлен этот же тип.
 
-![86box_floppy](screenshots/86box-settings-floppy-cdrom-floppy525-1200k.png)
-![1_2M_FDD](screenshots/Monitor_1_20230730-213442-950.png)
+![86box_floppy](https://habrastorage.org/webt/4w/py/fq/4wpyfqmjbllooyqxqzfk1hq8cv8.png)
+![1_2M_FDD](https://habrastorage.org/webt/y0/mv/yw/y0mvywl-hvryhlyb1ate7zndmda.png)
 
 Загружаемся как обычно с загрузочной дискеты `disk02`, не забываем при этом указать в качестве корневого раздела партицию `h2` при загрузке. Авторизуемся как `root`. Далее вместо загрузочной дискеты, в эмуляторе, вставляем дискету с патчами от Брюса Эванса [minix-386](dist/minix-386/minix-386.img), создаем каталог `/usr/oz`, монтируем дискету и копируем все файлы.
 > Файлы содержащие на дискете были взяты из [архива](http://www.oldlinux.org/Linux.old/study/linux-travel/minix-386/zhao.rar) с сайта oldlinux.org. Кроме патчей там есть есть полезные файлы.
@@ -723,10 +723,11 @@ cc -3 -D_POSIX_SOURCE -D_MINIX -o /user/bin/readclock readclock.c
 Убеждаемся, что дисковод по прежнеум вставлена дискета с shoelace и перезагружаем компьютер.
 
 Добро пожаловать в Minix-386!
-![minix-386](screenshots/Monitor_1_20230730-233503-069.png)
+![minix-386](https://habrastorage.org/webt/fd/kh/mr/fdkhmrv3fdmlkmnb_jsdszpg9cc.png)
 
 Не обращяем внимание, что часть программ `readclock`, `date`, `wtmp`, `printroot` и `stty` задействованные иницилизирующем скриптом `/etc/rc` не смог запуститься. В следующем разделе данного руководства исправим это.
-![minix-386-not-found](screenshots/Monitor_1_20230730-233512-173.png)
+![minix-386-not-found](https://habrastorage.org/webt/gy/xk/nu/gyxknupcepkzdeqd6yqcnk15rx0.png)
+
 ## Резервное копирование промежуточной точки
 Ставим эмулятор на паузу и сохраняемся.
 ```
@@ -781,7 +782,7 @@ sync
 ```
 
 Вот теперь можно перезагрузится и добро пожаловать в Minix-386 (снова)!
-![minix-386-again](screenshots/Monitor_1_20230804-085936-538.png)
+![minix-386-again](https://habrastorage.org/webt/j7/kl/u3/j7klu3cww5klhkaqexhnonhqkbe.png)
 
 ## Резервное копирование промежуточной точки
 Ставим эмулятор на паузу и сохраняемся.
@@ -1109,7 +1110,7 @@ dd if=Image of=/dev/at0
 ```
 И перезагружаем компьютер. И поздравляю, вы в Linux-0.01 с [финской](https://upload.wikimedia.org/wikipedia/commons/1/1c/IBM_model_M2_for_Sweden_and_Finland.jpg) раскладкой и [это хардкод](http://www.oldlinux.org/Linux.old/Linux-0.01/docs/RELNOTES-0.01).
 
-![linux-0.01](screenshots/Monitor_1_20230804-183930-803.png)
+![linux-0.01](https://habrastorage.org/webt/nn/yy/qp/nnyyqp3ss4bk1plc0y4_gjspn-4.png)
 
 ## Полезное
 В bash нет традиционных bin-утилит, даже обычно `ls`, но его можно эмулировать.
