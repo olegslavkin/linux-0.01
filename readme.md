@@ -2,14 +2,16 @@
 Данное руководство описывает попытку повторить, на сколько это возможно, первые шаги Линуса Торвальдса по компиляции и запуску самой первой версии ядра Linux 0.01. Процесс зарождения операционной системы, было хорошо написано в книге "[Ради удовольствия: Рассказ нечаянного революционера](https://ru.wikipedia.org/wiki/%D0%A0%D0%B0%D0%B4%D0%B8_%D1%83%D0%B4%D0%BE%D0%B2%D0%BE%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%B8%D1%8F)" (далее J4F). Но нас в первую очередь интересует техническая возможность компиляции, поэтому нам необходим PC на процессоре i386, с установленным minix-386 (minix c патчами Брюса Эванса) и всеми необходимыми утилитами для компиляции.
 
 # Оглавление<a name="toc"></a>
-1. [Предварительные условия](#req)
-2. [Установка оригинальной 16-битной версии Minix 1.5.10](#minix-1.5.10-ph)
-3. [Установка патчей от Брюса Аванса (Bruce Evans' 386 patches) ака minix-386](#minix-386)
-4. [Компиляция стандартных утилит 1.5.10 под архитектуру i386](#i386bin)
-5. [Установка бинарных gnu утилит (gcc 1.37.1, gas ?, make ?, bash ?) от AWB (Alan W Black)](#gnubin137)
-6. [Компиляция ядра linux 0.01 и попытка загрузиться](#linux-0.01)
+1. [Предположительные характеристики PC Линуса Торвальдса](#linus-pc)
+2. [Предварительные условия](#req)
+3. [Установка оригинальной 16-битной версии Minix 1.5.10](#minix-1.5.10-ph)
+4. [Установка патчей от Брюса Аванса (Bruce Evans' 386 patches) ака minix-386](#minix-386)
+5. [Компиляция стандартных утилит 1.5.10 под архитектуру i386](#i386bin)
+6. [Установка компилятора GCC-1.37.1 от Alan W Black и Richard Tobin](#gnubin137)
+7. [Компиляция ядра Linux 0.01 и попытка загрузиться](#linux-0.01)
+8. [Разное](#other)
 
-# Предположительные характеристики PC Линуса Торвальдса
+# Предположительные характеристики PC Линуса Торвальдса<a name="linus-pc"></a>
 Предположительные характеристики PC Линуса Торвальдса, на основании различных источников в сети. В таблице, возможно, есть не точности.
 | Аппаратное обеспечение  |   Производитель, модель  |
 |-------------------------|:-------------------------|
@@ -22,7 +24,8 @@
 | Video                   | Производитель неизвестен на базе ET4000 на 1Mb <sup>[7](#note-video)</sup> |
 | FDD A                   | 3.5 1.44 <sup>[8](#note-35fdd)</sup> |
 | FDD B                   | 5.25 1.2 <sup>[9](#note-dualfdd)</sup> |
-| HDD C/D                 | Conner CP3044 IDE Type 17 <sup>[10](#note-hdd)</sup> |
+| HDD C                 | Conner CP3044 IDE Type 17 <sup>[10](#note-hdd)</sup> |
+| HDD D                 | Conner CP3044 IDE Type 17 |
 | Modem        | Производитель неизвестен <sup>[11](#note-modem)</sup> |
 | Клавиатура      | Финская клавиатура, производитель неизвестен |
 
@@ -33,10 +36,12 @@
 - [7] [Возможно](https://usenetarchives.com/view.php?id=comp.sys.ibm.pc.hardware&mid=PDEwNDE0QGh5ZHJhLkhlbHNpbmtpLkZJPg) в начале была карта Trident TVGA 8800 (?) <a name="note-video"></a>
 - [8] В руководстве указано устройство `/dev/PS0` (это 3.5`` 1.44M) <a name="note-35fdd"></a>
 - [9] Предположительно, что дисковод был, т.к. в то время было распространенной практикой иметь и 3.5 и 5.25 <a name="note-dualfdd"></a>
-- [10] 2 HDD c характеристиками [H5 S17 C980](https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive/+/refs/tags/v0.01/include/linux/config.h#48) + [CP3044](https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive/+/refs/tags/v0.01/kernel/hd.c#25). Факт наличия 2-го диска [(см. с момента "At my system fdisk reports the following...)](https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive/+/v0.11)
-- [11] Внешний HAYES совместимый (?) модем на [2400 baud](https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive/+/refs/tags/v0.01/kernel/serial.c#23)
+- [10] 2 HDD c характеристиками [H5 S17 C980](https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive/+/refs/tags/v0.01/include/linux/config.h#48) + [CP3044](https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive/+/refs/tags/v0.01/kernel/hd.c#25). Факт наличия 2-го диска [(см. с момента "At my system fdisk reports the following...)](https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive/+/v0.11)<a name="note-hdd"></a>
+- [11] Внешний [HAYES](https://ru.wikipedia.org/wiki/AT-%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B) совместимый (?) модем на [2400 baud](https://kernel.googlesource.com/pub/scm/linux/kernel/git/nico/archive/+/refs/tags/v0.01/kernel/serial.c#23)<a name="note-modem"></a>
 
 ## Предварительные условия<a name="req"></a>
+Данная инструкция написана и тестировалась на HP ProBook 440 G6 с операционной системой `Ubuntu 20.04.6 LTS` и версией эмулятора `86Box-Linux-x86_64-b4724.AppImage` (есть в директории `bin` репозитория).
+
 Клонируем репозиторий
 ```
 git clone git@github.com:olegslavkin/linux-0.01.git
@@ -1118,5 +1123,5 @@ alias ls='echo *'
 tar cvfJ backups/minix-386-1.5.10-linux-0.01.tar.xz disks/minix.img dist/minix-386/shoelace.img dist/linux/boot.img nvr/acc386.nvr 86box.cfg
 ```
 
-# Разное
+# Разное <a name="other"></a>
 1. В исходных дискетах minux нет файл ckcpro.c от kermit (он должен генерироваться через wart), поэтому я взял готовый от сюда https://www.tuhs.org/cgi-bin/utree.pl?file=Minix1.5/commands/kermit
