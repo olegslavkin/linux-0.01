@@ -9,6 +9,8 @@
 
 Приступим.
 
+---
+
 # Оглавление<a name="toc"></a>
 - [Введение](#введение)
 - [Оглавление](#оглавление)
@@ -26,6 +28,8 @@
 - [Компилируем и запускаем ядра Linux 0.01 ](#компилируем-и-запускаем-ядра-linux-001-)
 - [Заключение](#заключение)
 - [P.S.](#ps)
+
+---
 
 # Предположительные характеристики PC Линуса Торвальдса<a name="linus-pc"></a>
 Прежде чем начать сборку и компиляцию Linux нужно определиться с условиями, в которых приходилось работать Линусу Торвальдсу. В первую очередь интересует, какой у него был персональный компьютер и его характеристики. Да, мы достоверно знаем, на каком процессоре он работал, и ещё некоторые параметры, но я нигде в интернете не встречал (или плохо искал?) полную спецификацию его ПК. Поэтому решил на основе различных открытых источников провести «исследование» по этому вопросу. Вот на каком «железе», **по моему мнению**, работал автор ядра Linux. 
@@ -60,18 +64,20 @@
 
 Давайте теперь *приблизительно* сконфигурируем виртуальный компьютер в эмуляторе 86Box.
 
+---
+
 # Предварительные условия<a name="req"></a>
 Эта инструкция написана и тестировалась на HP ProBook 440 G6 с операционной системой Ubuntu 20.04.6 LTS и версией эмулятора 86Box-Linux-x86_64-b4724.AppImage (AppImage есть в директории bin репозитория).
 
 В первую очередь необходимо клонировать репозиторий:
-```
+```bash
 git clone git@github.com:olegslavkin/linux-0.01.git
 cd linux-0.01
 ```
 
 Далее необходимо распаковать архив с пустым и неразмеченным виртуальным жёстким диском на 68 Мб:
 
-```
+```bash
 mkdir -p disks
 xz -kdc backups/empty-hda.img.xz > disks/minix.img
 ```
@@ -82,7 +88,7 @@ xz -kdc backups/empty-hda.img.xz > disks/minix.img
 
 > Если у вас до этого не был установлен 86box, то необходимо будет установить набор [ROM](https://github.com/86Box/roms/releases/latest)-образов. [Подробнее см. в документации](https://86box.readthedocs.io/en/latest/usage/gettingstarted.html).
 
-```
+```bash
 $ ./86box -S
 ```
 И на основании приведённых ниже скриншотов конфигурируем виртуальный компьютер, с которым будем работать на протяжении всего этого руководства.
@@ -112,7 +118,7 @@ $ ./86box -S
 
 ## Загрузка Minix 1.5.10
 Запускаем эмулятор:
-```
+```bash
 $ ./86box
 ```
 Первым делом заходим в настройки BIOS (нажимаем клавишу DEL). Задаём характеристики жёсткого диска (наиболее подходящий нам тип type 36) и дисководов. **Важно**, чтобы “Floppy drive A:” был “360KB 5.25”. Сохраняем настройки BIOS и выходим.
@@ -122,7 +128,7 @@ $ ./86box
 ![Загрузочное меню Minix](https://habrastorage.org/webt/ts/ls/ho/tslshocapqa-_nbmsm92u1c7dkk.png)
 
 Когда загрузочная программа полностью загрузилась с дискеты (*в статусной строке эмулятора перестанет мигать зелёным цветом «индикатор» дисковода*, это может занять несколько секунд) и появилось приглашение ввода команды:
-```
+```sh
 # _
 ```
 …в меню эмулятора *Media -> Floppy 1 -> Existing image...* меняем на дискету с корневой файловой системой [disk04](https://github.com/olegslavkin/linux-0.01/raw/master/dist/minix/disk04.img). После этого в окне эмулятора вводим команду `=` для загрузки Minix в оперативную память (`/dev/ram`) с выбранной дискеты (`/dev/fd0`). После успешной загрузки в память, Minix предложит вставить дискету [disk05](https://github.com/olegslavkin/linux-0.01/raw/master/dist/minix/disk05.img), которая будет смонтирована в каталог `/usr`. Вставьте образ дискеты в меню эмулятора и нажмите Enter.
@@ -143,7 +149,7 @@ $ ./86box
 > Поскольку при написании этого руководства проброс COM-порта ещё не был добавлен в релиз (*это, предварительно, произойдёт в v4.0*), в репозитории есть AppImage. Промежуточная сборка скачана с их [Jenkins](https://ci.86box.net/job/86Box/).
 
 Однако на этапе установки из коробки нет возможности использовать getty, но очень легко это исправить. Для этого смонтируйте дискету disk04 в хостовой операционной системе (современный Linux всё ещё понимает старую файловую систему Minix) и добавьте одну строку в файл etc/ttys:
-```
+```bash
 $ sudo dist/minix/disk04.img <path>
 $ echo '2f1' >> <path>/etc/ttys
 
@@ -156,7 +162,7 @@ $ cat <path>/etc/ttys
 > Для этого руководства строка уже добавлена в disk04, но если хотите сделать это самостоятельно, то в репозитории есть оригинальная дискета [disk04.img.orig](https://github.com/olegslavkin/linux-0.01/raw/master/dist/minix/disk04.img.orig).
 
 И далее можно подключиться к Minix «удалённо». Псевдоустройство терминала `/dev/pts/7`, как в данном случае, будет отображено в stdout при запуске эмулятора 86box.
-```
+```bash
 $ minicom -o -c off -t vt100 -p pts/7 -b 9600
 ```
 ![minicom](https://habrastorage.org/webt/aj/vx/km/ajvxkmyalabtzzpfhhiukibnq1m.png)
@@ -164,7 +170,7 @@ $ minicom -o -c off -t vt100 -p pts/7 -b 9600
 <spoiler title="Подключиться можно не только с хоста на Minix, но и в обратную сторону...">
 
 Для этого на хостовой ОС запустите agetty:
-```
+```bash
 DEV='X'
 sudo agetty -o '-p -- \\u' --keep-baud 9600 pts/${DEV} vt100
 ```
@@ -184,7 +190,7 @@ connect
 
 ## Разметка жёсткого диска
 Перед началом установки Minix необходимо разметить виртуальный жёсткий диск. Для этого введите команду:
-```
+```bash
 # fdisk -h8 -s17 /dev/hd0
 ```
 Первая партиция диска `hd1` размером в 5 Мб и с файловой системой DOS не будет использована в этом руководстве, но она специально оставлена как возможность установки MS-DOS.
@@ -225,7 +231,7 @@ c
 n
 ```
 В результате получится такая таблица разделов:
-```
+```bash
                           ----first----  -----last----  --------sectors-------
 Num Sorted Active Type     Cyl Head Sec   Cyl Head Sec    Base    Last    Size
  1     1     A    DOS-BIG    0   0   2     75   7   16       1   10334   10334
@@ -234,7 +240,7 @@ Num Sorted Active Type     Cyl Head Sec   Cyl Head Sec    Base    Last    Size
  4     4          MINIX    906   0   1   1023   7   17  123216  139263   16048
 ```
 Для внесения изменений и выхода из fdisk нажмите `w` и выполните команду `sync`. Перезагрузите виртуальную машину и загрузитесь, как делали до этого. И потом вновь выполните `fdisk` и убедитесь, что всё успешно записалось. Для выхода из fdisk вводим `q`.
-```
+```bash
 # fdisk -h8 -s17 /dev/hd0
 
                           ----first----  -----last----  --------sectors-------
@@ -247,7 +253,7 @@ Num Sorted Active Type     Cyl Head Sec   Cyl Head Sec    Base    Last    Size
 (Enter 'h' for help.  A null line will abort any operation)
 ```
 Далее необходимо отформатировать средствами файловой системы все три Minix-партиции (раздела) жёсткого диска. Для каждой из них выполните команду `mkfs /dev/hdX <РАЗМЕР В БЛОКАХ>`, где `X` — это номер партиции, а `РАЗМЕР В БЛОКАХ` задаётся исходя из того, что блок занимает 1024 байта. Рассчитывается как количество секторов, разделённое на 2.
-```
+```bash
 # mkfs /dev/hd2 5100
 # mkfs /dev/hd3 51340
 # mkfs /dev/hd4 8024
@@ -255,7 +261,7 @@ Num Sorted Active Type     Cyl Head Sec   Cyl Head Sec    Base    Last    Size
 ## Установка (копирование) Minix 1.5.10 на жёсткий диск
 После подготовки жёстких дисков можно запустить shell-скрипт установки Minix 1.5.10. Для этого необходимо указать в качестве аргументов раздел корневого диска (в нашем случаи это `/dev/hd2`), размер `ram` в Мб, а также размеры (в блоках) всех четырёх партиций.
 
-```
+```bash
 # /etc/setup_root /dev/hd2 4096 5139 5100 51340 8024
 /dev/hd2 mounted
 /dev/hd2 unmounted
@@ -270,12 +276,12 @@ Num Sorted Active Type     Cyl Head Sec   Cyl Head Sec    Base    Last    Size
 > Если до этого вы подключались к Minix с помощью minicom, то после загрузки с дискеты можно вновь будет к ней подключиться. Если в эмуляторе 86Box перезагружаете виртуальный компьютер кнопкой Reset в меню эмулятора, то, как правило, устройство псевдотерминала остаётся тем же и в minicom ничего делать не надо, достаточно только ввести логин и пароль и далее следовать этому руководству.
 
 Теперь необходимо инициализировать раздел `/usr`. Для этого в терминале запускаем другой shell-скрипт, указав в качестве аргумента партицию диска, которую планируется использовать как `/usr`. В этом руководстве это `hd3`.
-```
+```bash
 # /etc/setup_usr /dev/hd3
 ```
 Начнётся инициализация раздела `/usr`. Скрипт попросит вставить по очереди дискеты с `disk05` по `disk17`.
 
-```
+```bash
 <Вырезано, оставлен вывод только последнего диска>
 
 /dev/fd0 mounted
@@ -337,19 +343,19 @@ Installation completed.
 </spoiler>
 
 Так как мы только что инициализировали раздел `/usr`, то нет больше необходимости вставлять дискету `disk05` в начале загрузки операционной системы. Теперь можно автоматически монтировать партицию диска `hd3` как `/usr`. Для этого надо немного исправить `/etc/rc`:
-```
+```bash
 # mined /etc/rc
 ```
 > Если редактируете файлы в minicom и подобных утилитах, то, возможно, при пролистывании в терминале будут некорректно отображаться документы. Редактировать файл можно в основной консоли эмулятора, где после его сохранения можно продолжить вводить команды в minicom. Или если вы знаете, как это исправить, напишите, пожалуйста, мне, и я включу это в руководство.
 
 Комментируем (или удаляем) строки монтирования дискеты (а также приглашение вставки дискеты) и добавляем запись монтирования раздела жёсткого диска.
-```
+```bash
 #/bin/getlf "Please insert /usr diskette in drive 0.  Then hit ENTER."
 #/etc/mount /dev/fd0 /usr           	# mount the floppy disk
 /etc/mount /dev/hd3 /usr            	# mount the hard disk
 ```
 Опционально, устанавливаем более высокую скорость serial-порта:
-```
+```bash
 # Initialize the first RS232 line to 9600 baud.
 /usr/bin/stty 9600 </dev/tty1
 ```
@@ -362,7 +368,7 @@ Installation completed.
 ## Тестирование работоспособности Minix
 Чтобы убедится, что операционная система установлена корректно, разработчики подготовили тестовые программы (предварительно необходимо их скомпилировать) и shell-скрипты. Для тестирования необходимо перейти в каталог и откомпилировать `*.c`. Рекомендуется компилировать как `root` (на последнем этапе для файлов устанавливаются права на выполнение):
 
-```
+```bash
 # cd /usr/src/test
 # make all
 ```
@@ -427,7 +433,7 @@ cc -F -D_MINIX -D_POSIX_SOURCE -o test20 test20.c;  	chmem =65000 test20
 </spoiler>
 
 А для запуска самих тестов рекомендуется авторизоваться как обычный пользователь, а не `root`. Авторизуйтесь как `ast` с паролем `Wachtwoord`.
-```
+```bash
 $ cd /usr/src/test
 $ run
 ```
@@ -471,7 +477,7 @@ Shell test  2 ok
 <spoiler title="Резервное копирование промежуточной точки">
 На этом этапе можно поставить эмулятор паузу и сохранить образ жёсткого диска, настройки BIOS, а также конфигурационный файл самого эмулятора. Это очень поможет в будущем, если необходимо будет откатить изменения.
 
-```
+```bash
 $ tar cvfJ backups/minix-1.5.10-install-hda.tar.xz disks/minix.img nvr/acc386.nvr 86box.cfg
 ```
 </spoiler>
@@ -490,7 +496,7 @@ $ tar cvfJ backups/minix-1.5.10-install-hda.tar.xz disks/minix.img nvr/acc386.nv
 
 > Файлы, содержащиеся на дискете, были взяты из [архива](http://www.oldlinux.org/Linux.old/study/linux-travel/minix-386/zhao.rar) с сайта oldlinux.org. Кроме патчей там есть другие полезные файлы.
 
-```
+```bash
 mkdir /usr/oz
 cd /usr/oz
 /etc/mount /dev/at0 /user
@@ -500,11 +506,11 @@ sync
 ```
 
 Подготавливаем загрузочную дискету. Вставляем дискету [shoelace](https://github.com/olegslavkin/linux-0.01/raw/master/dist/minix-386/shoelace.img) и форматируем её:
-```
+```bash
 mkfs /dev/at0 1200
 ```
 Переходим в каталог с архивами и распаковываем их:
-```
+```bash
 cd /usr/oz
 compress -d mx386_1.1.t.Z
 compress -d mx386_1.1.01.Z
@@ -517,7 +523,7 @@ rm mx386_1.1.t.Z
 rm mx386_1.1.01.Z
 ```
 Далее создаём папку для загрузчика и распаковываем его:
-```
+```bash
 mkdir /usr/oz/shoelace
 mv shl-1.0a.t.Z shoelace
 cd shoelace
@@ -526,7 +532,7 @@ tar xvf shl-1.0a.t
 rm shl-1.0a.t shl-1.0a.t.Z
 ```
 Создаём папку для компилятора bcc, распаковываем архивы с 16- и 32-битной версией и исходными кодами стандартной библиотеки Си:
-```
+```bash
 cd /usr/oz
 mkdir bcc
 mv bcc*.tar bcc
@@ -539,26 +545,26 @@ tar xvf bcclib.tar
 rm bcc*.tar
 ```
 Распаковываем архив с патчами minix-386, а также для удобства работы переименовываем директорию в mx386:
-```
+```bash
 cd /usr/oz
 tar xvf mx386_1.1.t
 mv mx386_1.1 mx386
 rm mx386_1.1.t
 ```
 Распаковываем небольшой патч на патч minix-386:
-```
+```bash
 cd /usr/oz
 unshar < mx386_1.1.01
 rm mx386_1.1.01
 mv klib386.x* /usr/oz/mx386/kernel
 ```
 Переходим в папку с патчами ядра и применяем:
-```
+```bash
 cd /usr/oz/mx386/kernel
 patch klib386.x klib386.x.cdif
 ```
 Монтируем загрузочную дискету (*в дисковод всё ещё должна быть вставлена дискета shoelace*), создаём необходимые директории и копируем директории `dev` и `etc`:
-```
+```bash
 /etc/mount /dev/at0 /user
 cd /user
 mkdir usr
@@ -568,12 +574,12 @@ cpdir -s dev /user/dev
 cpdir -ms etc /user/etc
 ```
 Удаляем три 16-битные версии программ:
-```
+```bash
 cd /user/etc
 rm mount umount update
 ```
 Комментируем строку с монтированием диска как `/usr`:
-```
+```bash
 mined /user/etc/rc
 # comment
 # /etc/mount /dev/hd3 /usr
@@ -581,7 +587,7 @@ mined /user/etc/rc
 В корне создаём папку `/local` и копируем в неё 16- и 32-битную версию компилятора.
 > Использование пути `/local` обязательно. Если он вдруг не подходит, то необходимо будет его изменить в `bcc.c` и перекомпилировать компилятор.
 
-```
+```bash
 cd /
 mkdir local
 
@@ -594,7 +600,7 @@ cpdir -ms bin0 /local/bin  # 16-bit compiler stuff
 cpdir -ms bin3 /local/bin3 # 32-bit compiler stuff
 ```
 Копируем патчи для ядра Minix в директорию с исходным кодом ядра, а также копируем патчи для заголовочных файлов:
-```
+```bash
 cpdir -ms fs /usr/src/fs         # mods for fs
 cpdir -ms kernel /usr/src/kernel # mods for kernel
 cpdir -ms mm /usr/src/mm     	 # mods for mm
@@ -608,7 +614,7 @@ cp other.cdif /usr/src/lib/other # to other
 cp posix.cdif /usr/src/lib/posix # and to posix
 ```
 Применяем патчи заголовочных файлов:
-```
+```bash
 cd /usr/include
 patch < include.cdif
 
@@ -628,7 +634,7 @@ cd /usr/oz/bcc/lib
 cpdir -ms bcc /usr/src/lib/bcc
 ```
 Сохраняем (*не удаляем, он ещё будет нужен*) оригинальный бинарный make и компилируем без флага `-DMINIXPC`:
-```
+```bash
 cd /usr/bin
 mv make make_s
 cd /usr/src/commands/make
@@ -637,7 +643,7 @@ make_s
 mv make /usr/bin
 ```
 Добавляем в PATH путь до компиляторов bcc, а также переименовываем оригинальный компилятор Си (сс) и делаем симлинк:
-```
+```bash
 PATH=/local/bin:$PATH
 export PATH
 cd /usr/bin
@@ -646,7 +652,7 @@ cd /local/bin
 ln bcc cc
 ```
 Компилируем 16-битную версию библиотеки `libc.a` и `longlib.a`:
-```
+```bash
 cd /usr/src/lib/ansi
 rm -f *.s
 cd ../posix
@@ -677,7 +683,7 @@ cd /usr/src/kernel
 ar t longlib.a  # check to be sure they are there...
 ```
 Компилируем 32-битную версию библиотеки:
-```
+```bash
 cd /usr/src/lib/bcc
 sh makelib 86 clean
 
@@ -690,13 +696,13 @@ cd ..
 sh makelib 386 clean
 ```
 Создаём директорию для компонентов ядра Minix:
-```
+```bash
 cd /etc
 mkdir system
 ```
 Компилируем компоненты ядра Minix. Обратите внимание, что при редактировании makefile.cpp необходимо, чтобы все строки препроцессора cpp начинались с начала строки.
 В процессе линковки могут появляться предупреждения `warning: _exit (или _unlock или _lock) redefined`. Не обращаем на них внимание ни сейчас, ни позже.
-```
+```bash
 cd /usr/src/mm
 rm -f *.s *.o
 mined makefile.cpp   # be sure all "#" commands start in column 1
@@ -710,7 +716,7 @@ mined makefile.cpp   # again, be sure all "#" commands start in col 1
 make             	# generate /etc/system/fs
 ```
 При редактировании `xx` удалите все комментарии, которые не относятся к синтаксису препроцессора `cpp`, а также лишние символы табуляции в таких выражениях как `#define O   	s`, `#if INTEL_32BITS`, `#else`, `#endif`.
-```
+```bash
 cd /usr/src/kernel
 cp makefile.cpp xx
 mined xx          	# remove all of the comment lines
@@ -720,14 +726,14 @@ sh config 386     	# set up proper files.
 make              	# generate  /etc/system/kernel
 ```
 Компилируем `init`. В процессе линковки также могут появиться предупреждения `warning: _exit (или _sbrk) redefined`, которые тоже игнорируем.
-```
+```bash
 cd /usr/src/tools
 cc -3 -c -D_POSIX_SOURCE -D_MINIX init.c
 ld -3 -o /etc/system/init /usr/local/lib/i386/head.o \
    init.o /usr/local/lib/i386/libc.a
 ```
 Компилируем загрузчик shoelace, но для этого временно возвращаем оригинальные make и cc.
-```
+```bash
 cd /usr/bin
 mv cc_old cc
 mv make make_o
@@ -739,7 +745,7 @@ mined shoe.c      	# Заменить <varargs.h> на "varargs.h"
 make -f makefile.min
 ```
 Создаём загрузочный сектор на дискете и копируем бинарные файлы загрузчика, его конфигурационные файлы и компоненты ядра Minix.
-```
+```bash
 cd /usr/oz/shoelace
 ./laceup /dev/at0 5.25dshd
 cd /etc/system
@@ -757,7 +763,7 @@ mined /user/etc/config
 setdev rootdev /dev/at0
 ```
 Возвращаем make и сс, а также переменную `PATH` в прежнее состояние.
-```
+```bash
 cd /usr/bin
 mv cc cc_old
 mv make make_s
@@ -766,7 +772,7 @@ PATH=/local/bin:$PATH
 export PATH
 ```
 Компилируем 32-битный sh:
-```
+```bash
 cd /user
 mkdir bin
 cd /usr/src/commands/sh
@@ -775,7 +781,7 @@ rm -f *.s *.o
 cc -3 -D_POSIX_SOURCE -o /user/bin/sh *.c
 ```
 Компилируем другие, минимально необходимые программы:
-```
+```bash
 cd /usr/src/commands
 cc -3 -D_POSIX_SOURCE -D_MINIX -o /user/bin/login login.c
 cc -3 -D_POSIX_SOURCE -D_MINIX -o /user/etc/update update.c
@@ -802,37 +808,38 @@ cc -3 -D_POSIX_SOURCE -D_MINIX -o /user/bin/readclock readclock.c
 
 Ставим эмулятор на паузу и сохраняемся:
 
-```
+```bash
 tar cvfJ backups/minix-386-1.5.10-stage1.tar.xz disks/minix.img dist/minix-386/shoelace.img nvr/acc386.nvr 86box.cfg
 ```
 </spoiler>
 
+---
 
 # Компиляция стандартных утилит 1.5.10 под архитектуру i386 <a name="i386bin"></a>
 После проверки, что мы успешно загрузились с новым ядром с дискеты, необходимо перекомпилировать утилиты. Для этого загружаем 16-битный Minix (используем дискету `disk02` и раздел жёсткого диска `h2`) и выполняем кросс-компиляцию 80386-версий бинарных утилит.
 
 Чтобы упростить процесс я подготовил Makefile и вспомогательный sh-скрипт. Распаковываем архив с Makefile его и запускаем компиляцию:
-```
+```bash
 cd /usr/oz
 compress -d bin32.tar.Z
 tar xvf bin32.tar && rm bin32.tar
 /tmp/bin32.sh | tee problems.out 2>&1
 ```
 Создаём директорию для 32-битной версии ядра и переносим туда скомпилированные на предыдущем этапе компоненты:
-```
+```bash
 mkdir /etc/system3
 cd /etc/system/
 mv kernel fs mm init /etc/system3
 ```
 Переносим бинарные файлы в `/bin`:
-```
+```bash
 cd /etc
 mv mount umount update /bin
 ```
 > Да, с точки зрения Minix это, возможно не канон, но так можно одновременно иметь как 16-, так и 32-битные версии программ. Также это упростит переключение между 16- и 32-битным режимом. Да и я уже просто привык, что mount/umount находится в PATH.
 
 Размонтируем дискету, если в дисководе вставлено что-то отличное от `shoelace`, поменяем на неё и примонтируйем. Меняем в конфигурационном файле загрузчика значение `rootdev` с дискеты (`at0`) на диск (`hd2`) и меняем пути для `mount` и `update`:
-```
+```bash
 umount /dev/at0
 mount /dev/at0 /user
 mined /user/etc/config
@@ -845,11 +852,11 @@ mined /etc/rc
 sync
 ```
 Переименуем директории. Не спешите перезагружаться!
-```
+```bash
 /local/bin/bin3
 ```
 Скрипт, который мы только что выполнили, не переименовывает директорию `/usr/binX`. Сделайте это вручную:
-```
+```bash
 /bin0/mv /usr/bin /usr/bin0
 /bin0/mv /usr/bin3 /usr/bin
 ```
@@ -860,7 +867,7 @@ sync
 <spoiler title="Резервное копирование промежуточной точки">
 Ставим эмулятор на паузу и сохраняемся:
 
-```
+```bash
 tar cvfJ backups/minix-386-1.5.10-stage2.tar.xz disks/minix.img dist/minix-386/shoelace.img nvr/acc386.nvr 86box.cfg
 ```
 </spoiler>
@@ -868,7 +875,7 @@ tar cvfJ backups/minix-386-1.5.10-stage2.tar.xz disks/minix.img dist/minix-386/s
 <spoiler title="Возврат на 16-битную версию">
 
 Если необходимо возвратиться на 16-ти битную версию, то нужно просто переименовывать пути до бинарных файлов, вставить дискету `disk02` и использовать раздел жёсткого диска `h2` как корневой.
-```
+```bash
 /local/bin/bin0
 /bin3/mv /usr/bin /usr/bin3
 /bin3/mv /usr/bin0 /usr/bin
@@ -889,16 +896,18 @@ tar cvfJ backups/minix-386-1.5.10-stage2.tar.xz disks/minix.img dist/minix-386/s
 
 </spoiler>
 
+---
+
 # Установка патча для сопроцессора 387 <a name="fix387"></a>
 Вставляем дискету с `shoelace` и для компиляции ядра временно мигрируем на 16-битную версию.
-```
+```bash
 /local/bin/bin0
 /bin3/mv /usr/bin /usr/bin3
 /bin3/mv /usr/bin0 /usr/bin
 /bin3/sync
 ```
 Вставляем дискету `disk02` и перезагружаемся. После перегрузки вставляем дискету с [gcc-1.37.1](https://github.com/olegslavkin/linux-0.01/raw/master/dist/gcc-1.37.1-plains/awb-gcc-1.37.1.img). Копируем патч ядра, имитирующий наличие сопроцессора 387. Он является частью gcc-1.37.1 и, как я понял, переназначает второй бит регистра `CR0`, «говорящий» компилятору, что у нас нет сопроцессора 387. Этот патч обязателен, в противном случае в будущем не получится собрать ядро Linux, мы получим ошибку компиляции `fp stack overflow`. После применения патча необходимо пересобрать ядро (*достаточно только kernel*) minix-386:
-```
+```bash
 /bin/mount /dev/at0 /user
 cp /user/klib386.cdiff /usr/src/kernel
 cd /usr/src/kernel
@@ -909,7 +918,7 @@ rm -f *.s *.o
 make
 ```
 Копируем ядро на загрузочную дискету. Размонтируем вставленную дискету, вставляем `shoelace`, монтируем её и копируем ядро:
-```
+```bash
 /bin/umount /dev/at0
 /bin/mount /dev/at0 /user
 mv /etc/system/kernel /etc/system3
@@ -917,7 +926,7 @@ cp /etc/system3/kernel /user/etc/system
 sync
 ```
 Мигрируем обратно на minix-386:
-```
+```bash
 /local/bin/bin3
 /bin0/mv /usr/bin /usr/bin0
 /bin0/mv /usr/bin3 /usr/bin
@@ -927,11 +936,12 @@ sync
 
 Ставим эмулятор на паузу и сохраняем текущее состояние.
 
-```
+```bash
 tar cvfJ backups/minix-386-1.5.10-stage3.tar.xz disks/minix.img dist/minix-386/shoelace.img nvr/acc386.nvr 86box.cfg
 ```
 </spoiler>
 
+---
 
 # Установка компилятора GCC-1.37.1 от Alan W Black и Richard Tobin <a name="gccbin137"></a>
 Как известно, ядро Linux было скомпилировано с помощью gcc. И в оригинале это была собственная пропатченная версия gcc 1.40 от Линуса с поддержкой опции `-mstring-insns` (*может, чего-то ещё*). Где сейчас можно найти именно эту версию компилятора, мне не известно. Возможно, [это](http://www.oldlinux.org/Linux.old/Linux-0.10/binaries/compilers/gccbin.tar.Z) та самая версия. В архиве файлы датированы 22 сентября 1991, очень-очень близко к тому времени. С другой стороны, на эти даты нельзя ориентироваться. Возможно, это gcc для сборки в самом Linux, а не в Minix.
@@ -939,13 +949,13 @@ tar cvfJ backups/minix-386-1.5.10-stage3.tar.xz disks/minix.img dist/minix-386/s
 Я пойду немного другим путём и буду использовать версию gcc-1.37.1 от Alan W Black и Richard Tobin, также известную как “awb-gcc from plains». Иногда в сети её называют просто “gcc from plains”. В природе существует и [gcc-1.40](https://www.cs.cmu.edu/~awb/pub/minix/gasdiff.tar.gz) для Minix-386, но его использовать не буду, потому что: а) патч не от Линуса Торвальдса, а от Энди Майкла (Andy Michael); б) есть только diff, надо его ещё и скомпилировать :)
 
 Загружаемся с дискеты `shoelace`, затем меняем её на дискету c [gcc-1.37.1](https://github.com/olegslavkin/linux-0.01/raw/master/dist/gcc-1.37.1-plains/awb-gcc-1.37.1.img), монтируем её и копируем 16-битную версию утилиты compress (*в Minix использовалась [13-битная компресия](https://www.unix.com/man-page/minix/1/compress/)*):
-```
+```bash
 mount /dev/at0 /user
 cp /user/16bcompress /usr/bin
 chmod 755 /usr/bin/16bcompress
 ```
 Копируем бинарные файлы gcc во временную папку, распаковываем и устанавливаем их:
-```
+```bash
 cd /usr/tmp
 cp /user/gcc*.tar.Z /usr/tmp
 16bcompress -d gcc*.tar.Z
@@ -963,7 +973,7 @@ cd /usr/tmp
 rm -fr gccbin*
 ```
 Устанавливаем заголовочные файлы:
-```
+```bash
 cd /usr/tmp
 tar xvf gccinc.tar
 cd gccinc
@@ -973,7 +983,7 @@ cd /usr/tmp
 rm -fr gccinc*
 ```
 Устанавливаем библиотеки Си:
-```
+```bash
 cd /usr/tmp
 tar xvf gcclib.tar
 cd gcclib
@@ -986,7 +996,7 @@ cd /usr/tmp
 rm -rf gcclib*
 ```
 Тестируем компилятор, пишем традиционный “Hello World”:
-```
+```bash
 cd /usr/tmp
 PATH=/usr/local/bin/:$PATH
 export PATH
@@ -1002,31 +1012,32 @@ EOF
 gcc gcc_test.c
 ```
 На выходе получим тоже традиционный a.out. Но если попробовать запустить его напрямую, то получим ошибку:
-```
+```bash
 a.out
 : not found
 ```
 Всё дело в том, что gcc генерирует бинарный файл напрямую несовместимый с Minix. Есть два пути решения. Первый (популярный): сконвертировать в совместимый формат с помощью gcc2minix, который входил в комплект gccbin.
-```
+```bash
 gcc2minix < a.out > test
 chmod +x test
 ./test
 Hello World
 ```
-Второй вариант: использовать патч[gnutoo](https://www.cs.cmu.edu/~awb/pub/minix/gnutoo.tar.gz). У меня он не сработал, но, возможно, я что-то сделал неправильно.
+Второй вариант: использовать патч [gnutoo](https://www.cs.cmu.edu/~awb/pub/minix/gnutoo.tar.gz). У меня он не сработал, но, возможно, я что-то сделал неправильно.
 
 <spoiler title="Резервное копирование промежуточной точки">
 
 Ставим эмулятор на паузу и сохраняем текущее состояние.
-```
+```bash
 tar cvfJ backups/minix-386-1.5.10-gcc1.37.1.tar.xz disks/minix.img dist/minix-386/shoelace.img nvr/acc386.nvr 86box.cfg
 ```
 </spoiler>
 
+---
 
 # Компилируем и запускаем ядра Linux 0.01 <a name="linux-0.01"></a>
 И вот, наконец-то, после всех этапов подготовки можно приступить к компиляции ядра Linux. Но для этого нужно ещё чуть-чуть подготовиться :). Помните, в самом начале, когда разбивали жесткий диск на разделы, у нас остался неиспользованный раздел `h4`? Его оставили как раз для Linux. Отформатируем раздел, а также подключим его в автомонтирование при запуске Minix-386:
-```
+```bash
 mkdir /linux
 mkfs /dev/hd4 8024
 mined /etc/rc
@@ -1035,7 +1046,7 @@ mined /etc/rc
 /bin/mount /dev/hd4 /linux
 ```
 Создадим необходимые каталоги:
-```
+```bash
 cd /linux
 mkdir usr
 mkdir tmp
@@ -1043,7 +1054,7 @@ cd usr
 mkdir src
 ```
 Вставляем дискету с исходными кодами Linux [linux-src-0.01](https://github.com/olegslavkin/linux-0.01/raw/master/dist/linux/src.img) и монтируем дискету. Сам архив c исходными кодами [linux-0.01.tar.Z](http://www.oldlinux.org/Linux.old/Linux-0.01/sources/system/linux-0.01.tar.Z) взят с сайта oldlinux.org. Примечательно, что на официальном сайте ядра Linux имеется [tar.gz версия](https://mirrors.edge.kernel.org/pub/linux/kernel/Historic/linux-0.01.tar.gz) от октября 1993 (*ядро 0.01, я напомню, [«родилось» 17.09.1991](https://lkml.org/lkml/2021/9/17/1018)*). Это, скорее всего переупаковка в формат архива, поддерживаемого GNU-утилитами того времени.
-```
+```bash
 /bin/mount /dev/at0 /user
 cp /user/linux.tar.Z /linux/tmp
 16bcompress -d /linux/tmp/linux.tar.Z
@@ -1053,7 +1064,7 @@ rm /linux/tmp/linux.tar
 cd linux
 ```
 Адаптация ядра под gcc-1.37.1:
-```
+```bash
 mined Makefile
 
 # Добавляем путь до gnulib:
@@ -1078,7 +1089,7 @@ mined lib/Makefile
 
 > Сейчас и чуть позже вы увидите, почему я сомневаюсь, что у Линуса был компьютер с 4 Мб оперативной памяти, скорее всего у него было 8Мб. Возможно, при покупке было действительно 4, но потом увеличил до 8. Как, возможно, и добавил второй жёсткий диск.
 
-```
+```bash
 # Указываем, что будем использовать 1,2 Мб
 mined boot/boot.s
 | sectors = 18
@@ -1121,13 +1132,13 @@ mined include/linux/config.h
 #endif
 ```
 Добавляем в PATH пути до компиляторов и ассемблера, и наконец компилируем:
-```
+```bash
 PATH=/usr/local/bin:/local/bin:/bin:/usr/bin
 export PATH
 make
 ```
 Если компиляция пройдёт успешно, то в папке с ядром появится файл `Image`. Это и есть наше ядро Linux.
-```
+```bash
 ...
 gld -s -x -M boot/head.o init/main.o \
 kernel/kernel.o mm/mm.o fs/fs.o \
@@ -1153,11 +1164,11 @@ sync
 
 <spoiler title="Но, возможно, у вас, как и у меня, компиляция может упасть с ошибкой">
 
-```
+```bash
 gcc: installation problem, cannot exec /usr/local/lib/gcc/gcc-cc1: No more processes
 ```
 Это происходит, как я понял, из-за малого размера оперативной памяти (напомню, мы используем 4 Мб). И тут есть два решения: а) в настройках эмулятора временно увеличить до 8 Мб и всё заработает как надо; или б) выполнить сборку в несколько этапов.
-```
+```bash
 cd kernel && make
 cd ../mm  && make
 cd ../fs  && make
@@ -1168,7 +1179,7 @@ cd .. 	&& make
 </spoiler>
 
 После успешной компиляции создаём необходимые директории и устройства на жёстком диске.
-```
+```bash
 cd /linux
 mkdir dev
 mkdir bin
@@ -1188,13 +1199,13 @@ mknod hd4 b 3 4 8024
 
 > bash не оригинальный, скомпилирован в 2004 году, скорее всего Jiong Zhao (автором сайта oldlinux.org). В оригинале должен использоваться [bash-1.08](https://ru.wikipedia.org/wiki/%D0%AF%D0%B4%D1%80%D0%BE_Linux#cite_note-minix-10), но мне не удалось найти ни бинарный, ни исходный код этой версии.
 
-```
+```bash
 /bin/mount /dev/at0 /user
 cp /user/bash /linux/bin/sh
 cp /user/update /linux/bin/update
 ```
 Вставляем чистую дискету [boot](https://github.com/olegslavkin/linux-0.01/raw/master/dist/linux/boot.img) и записываем на неё ядро.
-```
+```bash
 /bin/umount /dev/at0
 cd /linux/usr/src/linux
 
@@ -1211,10 +1222,12 @@ dd if=Image of=/dev/at0
 <spoiler title="Резервное копирование промежуточной точки">
 
 Ставим эмулятор на паузу и сохраняем текущее состояние.
-```
+```bash
 tar cvfJ backups/minix-386-1.5.10-linux-0.01.tar.xz disks/minix.img dist/minix-386/shoelace.img dist/linux/boot.img nvr/acc386.nvr 86box.cfg
 ```
 </spoiler>
+
+---
 
 # Заключение
 Кроме Linux 0.01 мы сделали три различные среды, в которых можно долго и увлекательно проводить время.
@@ -1224,6 +1237,8 @@ tar cvfJ backups/minix-386-1.5.10-linux-0.01.tar.xz disks/minix.img dist/minix-3
 Во-вторых, это Minix-386, для которой тоже сделали немало интересного. Например, была реализация GUI Mini-X (не X11 совместимая), виртуальные консоли (прямо как современный screen), реализация [IP-стека](http://www.nic.funet.fi/pub/minix/communications/tnet4.tar.Z), которого не было в Minix, но очень многие его просили, и многое другое.
 
 И в-третьих, мы сделали среду с gcc и Linux, где можно самостоятельно скомпилировать и запустить другие версии ядра или попробовать портировать GNU-утилиты. К сожалению, последующие версии ядра 0.02 и 0.03 не сохранились до наших дней, а из [0.10](https://mirrors.edge.kernel.org/pub/linux/kernel/Historic/old-versions/tytso/linux-0.10.tar.gz) сохранилась только версия [Theodore Ts'o](https://en.wikipedia.org/wiki/Theodore_Ts%27o). Зато на версиях 0.11 и 0.12 можно [изучать](http://www.oldlinux.org/download/ECLK-5.0-WithCover.pdf) внутрее строение ядра Linux.
+
+---
 
 # P.S.
 Если у кого-нибудь будет желание запустить всё на настоящем, а не виртуальном «железе», и у вас появятся вопросы, то мои контакты можно найти в профиле Хабра или на github.com.
