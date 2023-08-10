@@ -37,7 +37,7 @@
 | Аппаратное обеспечение  |   Производитель, модель  |
 |-------------------------|:-------------------------|
 | SVGA Монитор, 14 дюймов    	| GoldStar 1460 Plus<sup>[1](#note-j4f) [2](https://usenetarchives.com/view.php?id=comp.sys.ibm.pc.hardware&mid=PDEwNDE0QGh5ZHJhLkhlbHNpbmtpLkZJPg)</sup> |
-| Системный блок      	| Н/Д. «Неизвестный серый ящик»<sup>[3](#note-j4f)</sup> |
+| Системный блок      	| Н/Д. «Простой серый системный блок»<sup>[3](#note-j4f)</sup> |
 | Материнская плата   	| Н/Д |
 | CPU                 	| Intel 386DX, 33 МГц<sup>[4](#note-j4f)</sup> |
 | FPU                 	| Intel 387<sup>[5](#note-387)</sup> |
@@ -1241,7 +1241,9 @@ tar cvfJ backups/minix-386-1.5.10-linux-0.01.tar.xz disks/minix.img dist/minix-3
 
 Во-вторых, это Minix-386, для которой тоже сделали немало интересного. Например, была реализация GUI Mini-X (не X11 совместимая), виртуальные консоли (прямо как современный screen), реализация [IP-стека](http://www.nic.funet.fi/pub/minix/communications/tnet4.tar.Z), которого не было в Minix, но очень многие его просили, и многое другое.
 
-И в-третьих, мы сделали среду с gcc и Linux, где можно самостоятельно скомпилировать и запустить другие версии ядра или попробовать портировать GNU-утилиты. К сожалению, последующие версии ядра 0.02 и 0.03 не сохранились до наших дней, а из [0.10](https://mirrors.edge.kernel.org/pub/linux/kernel/Historic/old-versions/tytso/linux-0.10.tar.gz) сохранилась только версия [Theodore Ts'o](https://en.wikipedia.org/wiki/Theodore_Ts%27o). Зато на версиях 0.11 и 0.12 можно [изучать](http://www.oldlinux.org/download/ECLK-5.0-WithCover.pdf) внутрее строение ядра Linux.
+И в-третьих, мы сделали среду с gcc и Linux, где можно самостоятельно скомпилировать и запустить другие версии ядра или попробовать портировать GNU-утилиты. К сожалению, последующие версии ядра 0.02 и 0.03 не сохранились до наших дней, а из [0.10](https://mirrors.edge.kernel.org/pub/linux/kernel/Historic/old-versions/tytso/linux-0.10.tar.gz) сохранилась только версия [Theodore Ts'o](https://en.wikipedia.org/wiki/Theodore_Ts%27o). Зато на версиях 0.11 и 0.12 можно [изучать](http://www.oldlinux.org/download/ECLK-5.0-WithCover.pdf) внутренне строение ядра Linux.
+
+А ещё, всё тот же автор oldlinux.org Jiong Zhao [написал](http://www.oldlinux.org/Linux.old/bochs-images/linux-0.00-050613.zip) фейковую версию [0.00](http://gunkies.org/wiki/Linux_0.00). Как писал Линус: "Моя первая тестовая программа использовала один процесс для выдачи на экран буквы А, а другой – для выдачи буквы В. (Звучит тоскливо – я знаю.) Я запрограммировал это так, чтобы каждую секунду писалось несколько букв. С помощью прерывания по таймеру я сделал так, что сначала экран заполнялся ААААААА. Потом неожиданно буквы сменялись на ВВВВВВВВВ.". Однако у меня в 86Box она не заработала :(.
 
 ---
 
