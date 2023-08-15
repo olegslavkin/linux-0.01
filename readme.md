@@ -28,6 +28,7 @@
 - [Компилируем и запускаем ядра Linux 0.01 ](#компилируем-и-запускаем-ядра-linux-001-)
 - [Заключение](#заключение)
 - [P.S.](#ps)
+- [P.S.S](#pss)
 
 ---
 
@@ -1086,7 +1087,7 @@ tools/build: tools/build.c
 	chmem +65000 tools/build
 
 # Удаляем `-mstring-insns` из CFLAGS
-mined fs/makefile
+mined fs/Makefile
 mined kernel/Makefile
 mined lib/Makefile
 ```
@@ -1249,3 +1250,6 @@ tar cvfJ backups/minix-386-1.5.10-linux-0.01.tar.xz disks/minix.img dist/minix-3
 
 # P.S.
 Если у кого-нибудь будет желание запустить всё на настоящем, а не виртуальном «железе», и у вас появятся вопросы, то мои контакты можно найти в профиле Хабра или на github.com.
+
+# P.S.S
+Пока писалась это руководство, выложили статью о [внутренностях Linux версии 0.01](https://habr.com/ru/articles/754322/). Рекомендую ознакомится с ней.
